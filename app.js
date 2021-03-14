@@ -66,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   }
 
-
   // funções para keycode
 
   function control (e) {
@@ -75,17 +74,17 @@ document.addEventListener('DOMContentLoaded', () => {
       moveLeft()
     }
     else if (e.keyCode === 38) {
-      // rotate
+      rotate()
     }
     else if (e.keyCode === 39) {
-      // moveright
+
+      moveRight()
     }
     else if (e.keyCode === 40) {
-      // movedown
+      moveDown()
     }
-
   }
-  document.addEventListener ('keyup', control)
+  document.addEventListener('keyup', control)
 
 
   // movendo o tetraminó para baixo a cada 1 segundo
@@ -98,6 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // função auxiliar para iniciar um novo tetraminó
+  random = Math.floor(Math.random() * tetrominoes.length)
+  current = tetrominoes[random][currentRotation]
 
   function startAgain () {
     random = Math.floor(Math.random() * tetrominoes.length)
@@ -120,13 +121,33 @@ document.addEventListener('DOMContentLoaded', () => {
   function moveLeft () {
     undraw()
     const isAtLeftEdge = current.some(index => (currentPosition + index) % width === 0)
-    if (!isAtLeftEdge) {currentPosition -= 1}
+    if (!isAtLeftEdge) { currentPosition -= 1 }
 
     if (current.some(index => squares[currentPosition + index].classList.contains('taken'))) {
       currentPosition += 1
     }
     draw()
-
   }
 
+  // mover o tetraminó para a direita, até o limite do grid
+  function moveRight () {
+    undraw()
+    const isAtRightEdge = current.some(index => (currentPosition + index) % width === width - 1)
+    if (!isAtRightEdge) currentPosition += 1
+    if (current.some(index => squares[currentPosition + index].classList.contains('taken'))) {
+      currentPosition -= 1
+    }
+    draw()
+  }
+
+  //  função para rotacionar o tretaminó, se chegar ao limite de possibilidades, volta para a primeira
+  function rotate() {
+    undraw()
+    currentRotation++
+    if (currentRotation === current.length) {
+      currentRotation = 0
+    }
+    current = tetrominoes[random][currentRotation]
+    draw()
+  }
 })
