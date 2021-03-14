@@ -66,6 +66,28 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   }
 
+
+  // funções para keycode
+
+  function control (e) {
+
+    if (e.keyCode === 37) {
+      moveLeft()
+    }
+    else if (e.keyCode === 38) {
+      // rotate
+    }
+    else if (e.keyCode === 39) {
+      // moveright
+    }
+    else if (e.keyCode === 40) {
+      // movedown
+    }
+
+  }
+  document.addEventListener ('keyup', control)
+
+
   // movendo o tetraminó para baixo a cada 1 segundo
   timerId = setInterval(moveDown, 1000)
   function moveDown () {
@@ -98,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function moveLeft () {
     undraw()
     const isAtLeftEdge = current.some(index => (currentPosition + index) % width === 0)
-    if (!isAtLeftEdge) currentPosition -= 1
+    if (!isAtLeftEdge) {currentPosition -= 1}
 
     if (current.some(index => squares[currentPosition + index].classList.contains('taken'))) {
       currentPosition += 1
@@ -106,4 +128,5 @@ document.addEventListener('DOMContentLoaded', () => {
     draw()
 
   }
+
 })
