@@ -1,153 +1,191 @@
 document.addEventListener('DOMContentLoaded', () => {
   const grid = document.querySelector('.grid')
-  // Adicionando o grid
   let squares = Array.from(document.querySelectorAll('.grid div'))
-  const scoredisplay = document.querySelector('#score')
+  const scoreDisplay = document.querySelector('#score')
   const startbutton = document.querySelector('#startbutton')
   const width = 10
+  let nextRandom = 0
+  let timerId
 
-  //  Adicionando os tetraminoes
+  //The Tetrominoes
   const lTetromino = [
-    [1, width + 1, width * 2 + 1, 2],
-    [width, width + 1, width + 2, width * 2 + 2],
-    [1, width + 1, width * 2 + 1, width * 2],
-    [width, width * 2, width * 2 + 1, width * 2 + 2]
+    [1, width+1, width*2+1, 2],
+    [width, width+1, width+2, width*2+2],
+    [1, width+1, width*2+1, width*2],
+    [width, width*2, width*2+1, width*2+2]
   ]
 
   const zTetromino = [
-    [0, width, width + 1, width * 2 + 1],
-    [width + 1, width + 2, width * 2, width * 2 + 1],
-    [0, width, width + 1, width * 2 + 1],
-    [width + 1, width + 2, width * 2, width * 2 + 1]
+    [0,width,width+1,width*2+1],
+    [width+1, width+2,width*2,width*2+1],
+    [0,width,width+1,width*2+1],
+    [width+1, width+2,width*2,width*2+1]
   ]
 
   const tTetromino = [
-    [1, width, width + 1, width + 2],
-    [1, width + 1, width + 2, width * 2 + 1],
-    [width, width + 1, width + 2, width * 2 + 1],
-    [1, width, width + 1, width * 2 + 1]
+    [1,width,width+1,width+2],
+    [1,width+1,width+2,width*2+1],
+    [width,width+1,width+2,width*2+1],
+    [1,width,width+1,width*2+1]
   ]
 
   const oTetromino = [
-    [0, 1, width, width + 1],
-    [0, 1, width, width + 1],
-    [0, 1, width, width + 1],
-    [0, 1, width, width + 1]
+    [0,1,width,width+1],
+    [0,1,width,width+1],
+    [0,1,width,width+1],
+    [0,1,width,width+1]
   ]
 
   const iTetromino = [
-    [1, width + 1, width * 2 + 1, width * 3 + 1],
-    [width, width + 1, width + 2, width + 3],
-    [1, width + 1, width * 2 + 1, width * 3 + 1],
-    [width, width + 1, width + 2, width + 3]
+    [1,width+1,width*2+1,width*3+1],
+    [width,width+1,width+2,width+3],
+    [1,width+1,width*2+1,width*3+1],
+    [width,width+1,width+2,width+3]
   ]
 
-  const tetrominoes = [lTetromino, zTetromino, tTetromino, oTetromino, iTetromino]
+  const theTetrominoes = [lTetromino, zTetromino, tTetromino, oTetromino, iTetromino]
 
   let currentPosition = 4
   let currentRotation = 0
-  // Selecionar um tetraminó aleatório
-  let randomNumber = Math.floor(Math.random()*tetrominoes.length)
-  let current = tetrominoes[randomNumber][0]
 
-  // desenhando o tetraminó
+  console.log(theTetrominoes[0][0])
 
-  function draw () {
+  // Seleciona aleatoriamente o a rotação do primeiro tetraminó
+  let random = Math.floor(Math.random()*theTetrominoes.length)
+  let current = theTetrominoes[random][currentRotation]
+
+  //desenha o tetraminó
+  function draw() {
     current.forEach(index => {
       squares[currentPosition + index].classList.add('tetromino')
     })
   }
-
-  // apagando o tetraminó
-
-  function undraw () {
+  function undraw() {
     current.forEach(index => {
       squares[currentPosition + index].classList.remove('tetromino')
+      squares[currentPosition + index].style.backgroundColor = ''
+
     })
   }
 
-  // funções para keycode
-
-  function control (e) {
-
-    if (e.keyCode === 37) {
+  //Funções para as teclas de seta
+  function control(e) {
+    if(e.keyCode === 37) {
       moveLeft()
-    }
-    else if (e.keyCode === 38) {
+    } else if (e.keyCode === 38) {
       rotate()
-    }
-    else if (e.keyCode === 39) {
-
+    } else if (e.keyCode === 39) {
       moveRight()
-    }
-    else if (e.keyCode === 40) {
+    } else if (e.keyCode === 40) {
       moveDown()
     }
   }
   document.addEventListener('keyup', control)
 
-
-  // movendo o tetraminó para baixo a cada 1 segundo
-  timerId = setInterval(moveDown, 1000)
-  function moveDown () {
+  //move down function
+  function moveDown() {
     undraw()
     currentPosition += width
     draw()
     freeze()
   }
 
-  // função auxiliar para iniciar um novo tetraminó
-  random = Math.floor(Math.random() * tetrominoes.length)
-  current = tetrominoes[random][currentRotation]
-
-  function startAgain () {
-    random = Math.floor(Math.random() * tetrominoes.length)
-    current = tetrominoes[random][currentRotation]
-    currentPosition = 4
-    draw()
-  }
-
-  // função de congelar o tetraminó
-
-  function freeze () {
-    if (current.some(index => squares[currentPosition + index + width].classList.contains('taken'))) {
+  //freeze function
+  function freeze() {
+    if(current.some(index => squares[currentPosition + index + width].classList.contains('taken'))) {
       current.forEach(index => squares[currentPosition + index].classList.add('taken'))
-      startAgain()
+      random = nextRandom
+      nextRandom = Math.floor(Math.random() * theTetrominoes.length)
+      current = theTetrominoes[random][currentRotation]
+      currentPosition = 4
+      draw()
+      displayShape()
     }
   }
 
-  // mover o tetraminó para a esquerda, até o limite do grid
 
-  function moveLeft () {
+  function moveLeft() {
     undraw()
     const isAtLeftEdge = current.some(index => (currentPosition + index) % width === 0)
-    if (!isAtLeftEdge) { currentPosition -= 1 }
-
-    if (current.some(index => squares[currentPosition + index].classList.contains('taken'))) {
-      currentPosition += 1
+    if(!isAtLeftEdge) currentPosition -=1
+    if(current.some(index => squares[currentPosition + index].classList.contains('taken'))) {
+      currentPosition +=1
     }
     draw()
   }
 
-  // mover o tetraminó para a direita, até o limite do grid
-  function moveRight () {
+
+  function moveRight() {
     undraw()
-    const isAtRightEdge = current.some(index => (currentPosition + index) % width === width - 1)
-    if (!isAtRightEdge) currentPosition += 1
-    if (current.some(index => squares[currentPosition + index].classList.contains('taken'))) {
-      currentPosition -= 1
+    const isAtRightEdge = current.some(index => (currentPosition + index) % width === width -1)
+    if(!isAtRightEdge) currentPosition +=1
+    if(current.some(index => squares[currentPosition + index].classList.contains('taken'))) {
+      currentPosition -=1
     }
     draw()
   }
 
-  //  função para rotacionar o tretaminó, se chegar ao limite de possibilidades, volta para a primeira
+  
+  function isAtRight() {
+    return current.some(index=> (currentPosition + index + 1) % width === 0)  
+  }
+  
+  function isAtLeft() {
+    return current.some(index=> (currentPosition + index) % width === 0)
+  }
+
   function rotate() {
     undraw()
-    currentRotation++
-    if (currentRotation === current.length) {
+    currentRotation ++
+    if(currentRotation === current.length) { //if the current rotation gets to 4, make it go back to 0
       currentRotation = 0
     }
-    current = tetrominoes[random][currentRotation]
+    current = theTetrominoes[random][currentRotation]
+    checkRotatedPosition()
     draw()
   }
+ 
+
+  
+
+  const displaySquares = document.querySelectorAll('.mini-grid div')
+  const displayWidth = 4
+  const displayIndex = 0
+
+
+
+  const upNextTetrominoes = [
+    [1, displayWidth+1, displayWidth*2+1, 2], //lTetromino
+    [0, displayWidth, displayWidth+1, displayWidth*2+1], //zTetromino
+    [1, displayWidth, displayWidth+1, displayWidth+2], //tTetromino
+    [0, 1, displayWidth, displayWidth+1], //oTetromino
+    [1, displayWidth+1, displayWidth*2+1, displayWidth*3+1] //iTetromino
+  ]
+
+  //display the shape in the mini-grid display
+  function displayShape() {
+    //remove any trace of a tetromino form the entire grid
+    displaySquares.forEach(square => {
+      square.classList.remove('tetromino')
+      square.style.backgroundColor = ''
+    })
+    upNextTetrominoes[nextRandom].forEach( index => {
+      displaySquares[displayIndex + index].classList.add('tetromino')
+    })
+  }
+
+  //add functionality to the button
+  startbutton.addEventListener('click', () => {
+    if (timerId) {
+      clearInterval(timerId)
+      timerId = null
+    } 
+    else {
+      draw()
+      timerId = setInterval(moveDown, 1000)
+      nextRandom = Math.floor(Math.random()*theTetrominoes.length)
+      displayShape()
+    }
+  })
+
 })
